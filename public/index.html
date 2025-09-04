@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn.active {
+            background-color: #2c3e50;
+        }
+
+        .btn.secondary {
+            background-color: #95a5a6;
+        }
+
+        .btn.secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .candidates-section {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            background-color: #34495e;
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .candidates-grid {
+            display: grid;
+            gap: 1px;
+            background-color: #ecf0f1;
+        }
+
+        .candidate-card {
+            background: white;
+            padding: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .candidate-info h3 {
+            margin: 0 0 0.5rem 0;
+            color: #2c3e50;
+        }
+
+        .candidate-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-item {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .candidate-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stage-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .stage-application { background-color: #e8f4fd; color: #1e88e5; }
+        .stage-screening { background-color: #fff3e0; color: #fb8c00; }
+        .stage-phone_interview { background-color: #f3e5f5; color: #8e24aa; }
+        .stage-technical_interview { background-color: #e8f5e8; color: #43a047; }
+        .stage-onsite_interview { background-color: #fff8e1; color: #ffa000; }
+        .stage-final_interview { background-color: #fce4ec; color: #c2185b; }
+        .stage-offer { background-color: #e0f2f1; color: #00695c; }
+        .stage-hired { background-color: #e8f5e8; color: #2e7d32; }
+        .stage-rejected { background-color: #ffebee; color: #c62828; }
+        .stage-withdrawn { background-color: #f5f5f5; color: #616161; }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .skill-tag {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .candidate-card {
+                grid-template-columns: 1fr;
+            }
+            
+            .candidate-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>📋 Candidate Management System</h1>
+        <p>Track and nurture candidates through your hiring pipeline</p>
+    </header>
+
+    <div class="container">
+        <!-- Dashboard Stats -->
+        <div class="dashboard" id="dashboard">
+            <div class="stat-card">
+                <div class="stat-number" id="totalCandidates">-</div>
+                <div class="stat-label">Total Candidates</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeCandidates">-</div>
+                <div class="stat-label">Active Candidates</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="hiredCandidates">-</div>
+                <div class="stat-label">Hired This Month</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search candidates by name, position, skills...">
+            </div>
+            <div class="filter-buttons">
+                <button class="btn active" onclick="filterCandidates('all')">All</button>
+                <button class="btn" onclick="filterCandidates('active')">Active</button>
+                <button class="btn" onclick="filterCandidates('interview')">In Interview</button>
+                <button class="btn secondary" onclick="showAddCandidateModal()">+ Add Candidate</button>
+            </div>
+        </div>
+
+        <!-- Candidates List -->
+        <div class="candidates-section">
+            <div class="section-header">
+                <h2>Candidates</h2>
+                <span id="candidateCount">0 candidates</span>
+            </div>
+            <div id="candidatesList" class="candidates-grid">
+                <div class="loading">Loading candidates...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Candidate Modal -->
+    <div id="addCandidateModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addCandidateModal')">&times;</span>
+            <h2>Add New Candidate</h2>
+            <form id="addCandidateForm">
+                <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+                <div class="form-group">
+                    <label for="position">Position *</label>
+                    <input type="text" id="position" name="position" required>
+                </div>
+                <div class="form-group">
+                    <label for="experience">Experience</label>
+                    <input type="text" id="experience" name="experience" placeholder="e.g., 3 years">
+                </div>
+                <div class="form-group">
+                    <label for="skills">Skills (comma separated)</label>
+                    <input type="text" id="skills" name="skills" placeholder="e.g., JavaScript, React, Node.js">
+                </div>
+                <div class="form-group">
+                    <label for="source">Source</label>
+                    <select id="source" name="source">
+                        <option value="direct">Direct Application</option>
+                        <option value="job_board">Job Board</option>
+                        <option value="referral">Referral</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="recruiter">Recruiter</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn">Add Candidate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let candidates = [];
+        let filteredCandidates = [];
+        let currentFilter = 'all';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCandidates();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                filterAndDisplayCandidates(searchTerm);
+            });
+
+            // Add candidate form
+            document.getElementById('addCandidateForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                addCandidate();
+            });
+        }
+
+        async function loadCandidates() {
+            try {
+                const response = await fetch('/api/candidates');
+                const result = await response.json();
+                
+                if (result.success) {
+                    candidates = result.data;
+                    filteredCandidates = candidates;
+                    displayCandidates();
+                    updateDashboard();
+                } else {
+                    showError('Failed to load candidates');
+                }
+            } catch (error) {
+                console.error('Error loading candidates:', error);
+                showError('Failed to load candidates');
+            }
+        }
+
+        function displayCandidates() {
+            const container = document.getElementById('candidatesList');
+            
+            if (filteredCandidates.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No candidates found</h3>
+                        <p>Try adjusting your search or filters</p>
+                    </div>
+                `;
+                document.getElementById('candidateCount').textContent = '0 candidates';
+                return;
+            }
+
+            const candidatesHtml = filteredCandidates.map(candidate => `
+                <div class="candidate-card">
+                    <div class="candidate-info">
+                        <h3>${candidate.fullName}</h3>
+                        <div class="candidate-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Position:</span> ${candidate.position}
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Email:</span> ${candidate.email}
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Experience:</span> ${candidate.experience || 'Not specified'}
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Source:</span> ${candidate.source}
+                            </div>
+                        </div>
+                        ${candidate.skills && candidate.skills.length > 0 ? `
+                            <div class="skills-list">
+                                ${candidate.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="candidate-actions">
+                        <div class="stage-badge stage-${candidate.stage}">${formatStageName(candidate.stage)}</div>
+                        <button class="btn" onclick="updateCandidateStage('${candidate.id}')">Update Stage</button>
+                        <button class="btn secondary" onclick="viewCandidate('${candidate.id}')">View Details</button>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = candidatesHtml;
+            document.getElementById('candidateCount').textContent = `${filteredCandidates.length} candidate${filteredCandidates.length !== 1 ? 's' : ''}`;
+        }
+
+        function formatStageName(stage) {
+            return stage.split('_').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
+        function filterCandidates(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-buttons .btn:not(.secondary)').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            filterAndDisplayCandidates(searchTerm);
+        }
+
+        function filterAndDisplayCandidates(searchTerm = '') {
+            filteredCandidates = candidates.filter(candidate => {
+                // Apply search filter
+                const matchesSearch = !searchTerm || 
+                    candidate.fullName.toLowerCase().includes(searchTerm) ||
+                    candidate.email.toLowerCase().includes(searchTerm) ||
+                    candidate.position.toLowerCase().includes(searchTerm) ||
+                    candidate.skills.some(skill => skill.toLowerCase().includes(searchTerm));
+
+                // Apply status filter
+                let matchesFilter = true;
+                if (currentFilter === 'active') {
+                    matchesFilter = candidate.status === 'active';
+                } else if (currentFilter === 'interview') {
+                    matchesFilter = ['phone_interview', 'technical_interview', 'onsite_interview', 'final_interview'].includes(candidate.stage);
+                }
+
+                return matchesSearch && matchesFilter;
+            });
+
+            displayCandidates();
+        }
+
+        async function addCandidate() {
+            const formData = new FormData(document.getElementById('addCandidateForm'));
+            const candidateData = Object.fromEntries(formData.entries());
+            
+            // Process skills
+            if (candidateData.skills) {
+                candidateData.skills = candidateData.skills.split(',').map(skill => skill.trim()).filter(skill => skill);
+            }
+
+            try {
+                const response = await fetch('/api/candidates', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(candidateData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    closeModal('addCandidateModal');
+                    document.getElementById('addCandidateForm').reset();
+                    await loadCandidates();
+                    showSuccess('Candidate added successfully!');
+                } else {
+                    showError(result.error || 'Failed to add candidate');
+                }
+            } catch (error) {
+                console.error('Error adding candidate:', error);
+                showError('Failed to add candidate');
+            }
+        }
+
+        async function updateCandidateStage(candidateId) {
+            const stages = [
+                'application', 'screening', 'phone_interview', 'technical_interview',
+                'onsite_interview', 'final_interview', 'offer', 'hired', 'rejected'
+            ];
+
+            const candidate = candidates.find(c => c.id === candidateId);
+            const currentStageIndex = stages.indexOf(candidate.stage);
+            const nextStage = stages[Math.min(currentStageIndex + 1, stages.length - 1)];
+
+            try {
+                const response = await fetch(`/api/candidates/${candidateId}/stage`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        stage: nextStage,
+                        notes: `Stage updated via web interface`
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    await loadCandidates();
+                    showSuccess('Candidate stage updated successfully!');
+                } else {
+                    showError(result.error || 'Failed to update candidate stage');
+                }
+            } catch (error) {
+                console.error('Error updating candidate stage:', error);
+                showError('Failed to update candidate stage');
+            }
+        }
+
+        function viewCandidate(candidateId) {
+            const candidate = candidates.find(c => c.id === candidateId);
+            if (candidate) {
+                alert(`Candidate Details:\n\n${JSON.stringify(candidate, null, 2)}`);
+            }
+        }
+
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/candidates/stats/overview');
+                const result = await response.json();
+
+                if (result.success) {
+                    const stats = result.data;
+                    document.getElementById('totalCandidates').textContent = stats.total;
+                    document.getElementById('activeCandidates').textContent = stats.byStatus.active || 0;
+                    document.getElementById('hiredCandidates').textContent = stats.byStatus.hired || 0;
+                }
+            } catch (error) {
+                console.error('Error updating dashboard:', error);
+            }
+        }
+
+        function showAddCandidateModal() {
+            document.getElementById('addCandidateModal').style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showSuccess(message) {
+            alert('✓ ' + message);
+        }
+
+        function showError(message) {
+            alert('✗ ' + message);
+        }
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
