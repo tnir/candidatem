@@ -1,6 +1,55 @@
-# Getting Started with Create React App
+# Candidatem - Employee Candidate Nurturing Management
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React-based dashboard for managing and nurturing employee candidates through the hiring process.
+
+![Candidate Dashboard](https://github.com/user-attachments/assets/c9e65355-f26f-40b7-a73b-2bc7676fe810)
+
+## Features
+
+- **Dashboard Overview**: Visual summary of active candidates, high priority candidates, and candidates in final stages
+- **Candidate Cards**: Detailed view of each candidate including:
+  - First contact date with days elapsed
+  - Current status in the hiring process
+  - Priority level (High/Medium/Low)
+  - Closing date when applicable
+- **Data Visualization**: 
+  - Bar chart showing priority distribution
+  - Doughnut chart showing status distribution
+- **Responsive Design**: Works on desktop and mobile devices
+
+## Technology Stack
+
+- **React** with TypeScript
+- **Chart.js** with react-chartjs-2 for data visualization
+- **CSS3** for styling and responsive design
+- **Jest** for testing
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (version 14 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/tnir/candidatem.git
+   cd candidatem
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Start the development server:
+   ```bash
+   npm start
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) to view the dashboard in your browser.
 
 ## Available Scripts
 
@@ -44,3 +93,48 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Future Enhancements
+
+The following features are planned for future releases:
+
+- **Persistent Data Storage**: Integration with Supabase or Cloudflare D1 for data persistence
+- **Candidate Management**: Add, edit, and delete candidates
+- **Advanced Filtering**: Filter candidates by status, priority, or date range
+- **Email Integration**: Track email communications with candidates
+- **Notes and Comments**: Add notes and comments to candidate records
+- **Calendar Integration**: Schedule and track interviews
+- **Reporting**: Advanced analytics and reporting features
+- **Team Collaboration**: Multi-user support with role-based permissions
+
+## Data Model
+
+The application uses the following data structure for candidates:
+
+```typescript
+interface Candidate {
+  id: string;
+  name: string;
+  firstContactDate: Date;
+  closingDate?: Date;
+  status: CandidateStatus;
+  priority: CandidatePriority;
+  isActive: boolean;
+}
+```
+
+### Candidate Statuses
+- Initial Contact
+- Phone Screening
+- Interview Scheduled
+- Technical Interview
+- Final Interview
+- Offer Made
+- Hired
+- Rejected
+- Withdrawn
+
+### Priority Levels
+- High
+- Medium
+- Low
